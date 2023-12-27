@@ -43,3 +43,13 @@ func Insert(w http.ResponseWriter, r *http.Request) {
 	}
 	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 }
+
+func Delete(w http.ResponseWriter, r *http.Request) {
+	idDoProduto, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil {
+		panic(err.Error())
+	}
+
+	models.DeletarProduto(idDoProduto)
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+}

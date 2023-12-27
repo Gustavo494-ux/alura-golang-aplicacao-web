@@ -1,6 +1,8 @@
 package models
 
-import "alura-golang-aplicacao-web/db"
+import (
+	"alura-golang-aplicacao-web/db"
+)
 
 type Produto struct {
 	Id         int
@@ -41,6 +43,21 @@ func CriarNovoProduto(produto Produto) {
 	}
 
 	_, err = insereDadosNoBanco.Exec(produto.Nome, produto.Descricao, produto.Preco, produto.Quantidade)
+	if err != nil {
+		panic(err.Error())
+	}
+}
+
+func DeletarProduto(idProduto int) {
+	db := db.ConectaComBancoDeDados()
+	defer db.Close()
+
+	deleteDadosNoBanco, err := db.Prepare("DELETE FROM produtos WHERE id = $1")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	_, err = deleteDadosNoBanco.Exec(idProduto)
 	if err != nil {
 		panic(err.Error())
 	}
