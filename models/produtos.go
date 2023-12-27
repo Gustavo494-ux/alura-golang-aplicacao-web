@@ -16,7 +16,7 @@ func BuscarTodosProdutos() []Produto {
 	db := db.ConectaComBancoDeDados()
 	defer db.Close()
 
-	selectdeTodosOsProdutos, err := db.Query("select * from produtos")
+	selectdeTodosOsProdutos, err := db.Query("select * from produtos order by id")
 	if err != nil {
 		panic(err)
 	}
@@ -46,6 +46,43 @@ func CriarNovoProduto(produto Produto) {
 	if err != nil {
 		panic(err.Error())
 	}
+}
+
+func UPDATE(produto Produto) {
+	db := db.ConectaComBancoDeDados()
+	defer db.Close()
+
+	insereDadosNoBanco, err := db.Prepare("UPDATE produtos SET nome=$1, descricao=$2, preco=$3, quantidade=$4 WHERE id  = $5")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	_, err = insereDadosNoBanco.Exec(produto.Nome, produto.Descricao, produto.Preco, produto.Quantidade, produto.Id)
+	if err != nil {
+		panic(err.Error())
+	}
+}
+
+func EditarProduto(id string) Produto {
+	db := db.ConectaComBancoDeDados()
+	defer db.Close()
+
+	produtoDoBanco, err := db.Query("SELECT * FROM PRODUTOS WHERE id  = $1", id)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	produtoParaAtualizar := Produto{}
+	for produtoDoBanco.Next() {
+		produtoDoBanco.Scan(
+			&produtoParaAtualizar.Id,
+			&produtoParaAtualizar.Nome,
+			&produtoParaAtualizar.Descricao,
+			&produtoParaAtualizar.Preco,
+			&produtoParaAtualizar.Quantidade)
+
+	}
+	return produtoParaAtualizar
 }
 
 func DeletarProduto(idProduto int) {
